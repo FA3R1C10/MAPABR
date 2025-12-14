@@ -171,16 +171,16 @@ axes[1,1].plot(industria_norm, color="blue", label="Indústria", linestyle="--")
 axes[1,1].plot(agropecuaria_norm, color="green", label="Agropecuária", linestyle="--")
 axes[1,1].plot(servicos_norm, color="red", label="Serviços", linestyle="--")
 axes[1,1].annotate(f"{ibcbr_norm.iloc[-1,0]:.2f}%",
-                   xy=(ibcbr_norm.index[-1], ibcbr_norm.iloc[-1,0] - 0.005),
+                   xy=(ibcbr_norm.index[-1], ibcbr_norm.iloc[-1,0] - 0.5),
                    ha="right", va="bottom", color="black", fontsize=5)
 axes[1,1].annotate(f"{industria_norm.iloc[-1,0]:.2f}%",
-                   xy=(industria_norm.index[-1], industria_norm.iloc[-1,0] - 0.006),
+                   xy=(industria_norm.index[-1], industria_norm.iloc[-1,0] - 0.5),
                    ha="center", va="bottom", color="blue", fontsize=5)
 axes[1,1].annotate(f"{agropecuaria_norm.iloc[-1,0]:.2f}%",
-                   xy=(agropecuaria_norm.index[-1], agropecuaria_norm.iloc[-1,0] + 0.002),
+                   xy=(agropecuaria_norm.index[-1], agropecuaria_norm.iloc[-1,0] - 1),
                    ha="center", va="bottom", color="green", fontsize=5)
 axes[1,1].annotate(f"{servicos_norm.iloc[-1,0]:.2f}%",
-                   xy=(servicos_norm.index[-1], servicos_norm.iloc[-1,0] + 0.004),
+                   xy=(servicos_norm.index[-1], servicos_norm.iloc[-1,0] + 0.05),
                    ha="center", va="bottom", color="red", fontsize=5)
 axes[1,1].legend(fontsize=6)
 axes[1,1].tick_params(axis="x", labelsize=6)  # ajuste o número
