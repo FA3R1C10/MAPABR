@@ -102,6 +102,9 @@ ibcbr_norm        = (ibcbr / ibcbr.iloc[0] - 1) * 100
 industria_norm    = (industria / industria.iloc[0] - 1) * 100
 agropecuaria_norm = (agropecuaria / agropecuaria.iloc[0] - 1) * 100
 servicos_norm     = (servicos / servicos.iloc[0] - 1) * 100
+ibcbr_var = ibcbr.pct_change() * 100
+ibcbr_var = ibcbr_var.astype(float).round(1).dropna()
+print(ibcbr_var) 
 #%% Gráfico 1 IPCA e Selic
 fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(12,6))
 axes[0,0].plot(selic, color="black", label="Selic")
@@ -166,22 +169,28 @@ axes[1,0].annotate(f"PIB YoY: {pib_yoy.iloc[-1,0]:.2f}%",
 axes[1,0].legend(fontsize = 6)
 axes[1,0].set_title("PIB Trimestral", loc="left", fontsize = 8)
 # Gráfico 4 -
-axes[1,1].plot(ibcbr_norm, color="black", label="IBC-BR", linestyle="-")
-axes[1,1].plot(industria_norm, color="blue", label="Indústria", linestyle="--")
-axes[1,1].plot(agropecuaria_norm, color="green", label="Agropecuária", linestyle="--")
-axes[1,1].plot(servicos_norm, color="red", label="Serviços", linestyle="--")
+colors = np.where(ibcbr_var.iloc[:,0] < 0, "red", "blue")
+colors_bar = np.where(ibcbr_var.iloc[-1,0] < 0, "red", "blue").item()
+axes[1,1].bar(x=ibcbr_var.index, height=ibcbr_var.iloc[:,-1],width=15, color=colors, label="IBC-BR mensal")
+axes[1,1].plot(ibcbr_norm, color="black", label="IBC-BR (YTD)", linestyle="-")
+axes[1,1].plot(industria_norm, color="darkblue", label="Indústria (YTD)", linestyle="--")
+axes[1,1].plot(agropecuaria_norm, color="green", label="Agropecuária (YTD)", linestyle="--")
+axes[1,1].plot(servicos_norm, color="darkgray", label="Serviços (YTD)", linestyle="--")
 axes[1,1].annotate(f"{ibcbr_norm.iloc[-1,0]:.2f}%",
                    xy=(ibcbr_norm.index[-1], ibcbr_norm.iloc[-1,0] - 0.5),
-                   ha="right", va="bottom", color="black", fontsize=5)
+                   ha="left", va="bottom", color="black", fontsize=5)
 axes[1,1].annotate(f"{industria_norm.iloc[-1,0]:.2f}%",
                    xy=(industria_norm.index[-1], industria_norm.iloc[-1,0] - 0.5),
-                   ha="center", va="bottom", color="blue", fontsize=5)
+                   ha="left", va="bottom", color="darkblue", fontsize=5)
 axes[1,1].annotate(f"{agropecuaria_norm.iloc[-1,0]:.2f}%",
-                   xy=(agropecuaria_norm.index[-1], agropecuaria_norm.iloc[-1,0] - 1),
-                   ha="center", va="bottom", color="green", fontsize=5)
+                   xy=(agropecuaria_norm.index[-1], agropecuaria_norm.iloc[-1,0] - 0.6),
+                   ha="left", va="bottom", color="green", fontsize=5)
 axes[1,1].annotate(f"{servicos_norm.iloc[-1,0]:.2f}%",
                    xy=(servicos_norm.index[-1], servicos_norm.iloc[-1,0] + 0.05),
-                   ha="center", va="bottom", color="red", fontsize=5)
+                   ha="left", va="bottom", color="darkgray", fontsize=5)
+axes[1,1].annotate(f"{ibcbr_var.iloc[-1,0]:.2f}%",
+                   xy=(ibcbr_var.index[-1], ibcbr_var.iloc[-1,0] - 0.35),
+                   ha="left", va="bottom", color=colors_bar, fontsize=5)
 axes[1,1].legend(fontsize=6)
 axes[1,1].tick_params(axis="x", labelsize=6)  # ajuste o número
 axes[1,1].set_title("IBC-BR e Setores", fontsize=8, loc="left")
