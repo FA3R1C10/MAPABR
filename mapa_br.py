@@ -110,7 +110,6 @@ agropecuaria_norm = (agropecuaria / agropecuaria.iloc[0] - 1) * 100
 servicos_norm     = (servicos / servicos.iloc[0] - 1) * 100
 ibcbr_var = ibcbr.pct_change() * 100
 ibcbr_var = ibcbr_var.astype(float).round(1).dropna()
-print(ibcbr_var) 
 #%% Gráfico 1 IPCA e Selic
 fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(16,10))
 axes[0,0].plot(selic, color="black", label="Selic")
@@ -209,3 +208,4 @@ plt.annotate("Fonte: IBGE / Banco Central do Brasil (BCB)", xy=(0.06,0.0),
 plt.annotate("Elaborado por: Fabricio Orlandin, CFP®", xy=(0.84,0.0),
              va="bottom", ha="right", xycoords="figure fraction",
              color="black", fontsize=10)
+plt.savefig("Mapa.jpeg")
