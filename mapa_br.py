@@ -1,5 +1,5 @@
 #%% importações
-from bcb import sgs, Expectativas
+from bcb import sgs
 import pandas as pd
 import numpy as np
 import datetime as dt
@@ -7,22 +7,28 @@ from statsmodels.tsa.filters.hp_filter import hpfilter
 import matplotlib.pyplot as plt
 import sidrapy as sdr
 #%% dataframes SELIC × IPCA
-selic = sgs.get(432, "2020-01-01", dt.datetime.today())
+selic0 = sgs.get(432, "2010-01-01", "2016-12-31")
+selic1 = sgs.get(432, "2017-01-01", dt.datetime.today())
+selic = pd.concat([selic0, selic1])
 selic = selic.rename(columns={"432":"Selic"})
-ipca = sgs.get (433, "2020-01-01", dt.datetime.today())
+ipca0 = sgs.get (433, "2010-01-01", "2016-12-31")
+ipca1 = sgs.get (433, "2017-01-01", dt.datetime.today())
+ipca = pd.concat([ipca0, ipca1])
 ipca = ipca.rename(columns={"433":"IPCA mensal"})
-ipca12m = sgs.get(13522, "2020-01-01", dt.datetime.today())
+ipca12m = sgs.get(13522, "2010-01-01", dt.datetime.today())
 ipca12m = ipca12m.rename(columns={"13522":"IPCA 12m"})
 # %% Dataframe Núcleos do IPCA
 nucleos = [11427, 16121, 27838, 27839, 11426, 4466, 16122, 28751, 28750]
-media_nucleos = sgs.get(nucleos, "2019-02-01", dt.datetime.today())
+media_nucleos0 = sgs.get(nucleos, "2009-02-01", "2015-12-31")
+media_nucleos1 = sgs.get(nucleos, "2016-01-01", dt.datetime.today())
+media_nucleos = pd.concat([media_nucleos0, media_nucleos1])
 media_nucleos["Média"] = media_nucleos.mean(axis=1)
 media_nucleos = media_nucleos["Média"]
 media_nucleos12m = media_nucleos.rolling(window=12).apply(lambda x:
                                                           (np.prod(1+x/100)-1)*100, raw=True).dropna()
 media_nucleos12m = pd.DataFrame(media_nucleos12m).astype(float).round(2)
 # %% Dataframe Desemprego
-desemprego = sgs.get(24369,"2019-02-01", dt.datetime.today())
+desemprego = sgs.get(24369,"2009-02-01", dt.datetime.today())
 desemprego = desemprego.rename(columns={"24380": "Desemprego (%) "})
 media_desemprego_12m = desemprego.rolling(window=12).mean().dropna()
 media_desemprego_12m = pd.DataFrame(media_desemprego_12m)
@@ -94,10 +100,10 @@ pib_df["Tendencia"] = pib_tendencia
 pib_df["Hiato"] = pib_df["Ciclo"] / pib_df["Tendencia"] * 100
 pib_df = pd.DataFrame(pib_df)
 #%% Dataframe IBC-BR
-ibcbr = sgs.get(24364, "2024-12-01", dt.datetime.today())
-industria = sgs.get(29604, "2024-12-01", dt.datetime.today())
-agropecuaria = sgs.get(29602, "2024-12-01", dt.datetime.today())
-servicos = sgs.get(29606, "2024-12-01", dt.datetime.today())
+ibcbr = sgs.get(24364, "2010-01-01", dt.datetime.today())
+industria = sgs.get(29604, "2010-01-01", dt.datetime.today())
+agropecuaria = sgs.get(29602, "2010-01-01", dt.datetime.today())
+servicos = sgs.get(29606, "2010-01-01", dt.datetime.today())
 ibcbr_norm        = (ibcbr / ibcbr.iloc[0] - 1) * 100
 industria_norm    = (industria / industria.iloc[0] - 1) * 100
 agropecuaria_norm = (agropecuaria / agropecuaria.iloc[0] - 1) * 100
@@ -106,7 +112,7 @@ ibcbr_var = ibcbr.pct_change() * 100
 ibcbr_var = ibcbr_var.astype(float).round(1).dropna()
 print(ibcbr_var) 
 #%% Gráfico 1 IPCA e Selic
-fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(12,6))
+fig, axes = plt.subplots(ncols=2, nrows=2, figsize=(16,10))
 axes[0,0].plot(selic, color="black", label="Selic")
 axes[0,0].plot(ipca12m, color="blue", label="IPCA 12m")
 axes[0,0].plot(media_nucleos12m, color="darkblue", label="Média Núcleos IPCA 12m", linestyle = "--")
@@ -169,13 +175,13 @@ axes[1,0].annotate(f"PIB YoY: {pib_yoy.iloc[-1,0]:.2f}%",
 axes[1,0].legend(fontsize = 6)
 axes[1,0].set_title("PIB Trimestral", loc="left", fontsize = 8)
 # Gráfico 4 -
-colors = np.where(ibcbr_var.iloc[:,0] < 0, "red", "blue")
+colors = np.where(ibcbr_var.iloc[:,0] < 0, "darkgray", "black")
 colors_bar = np.where(ibcbr_var.iloc[-1,0] < 0, "red", "blue").item()
 axes[1,1].bar(x=ibcbr_var.index, height=ibcbr_var.iloc[:,-1],width=15, color=colors, label="IBC-BR mensal")
-axes[1,1].plot(ibcbr_norm, color="black", label="IBC-BR (YTD)", linestyle="-")
-axes[1,1].plot(industria_norm, color="darkblue", label="Indústria (YTD)", linestyle="--")
-axes[1,1].plot(agropecuaria_norm, color="green", label="Agropecuária (YTD)", linestyle="--")
-axes[1,1].plot(servicos_norm, color="darkgray", label="Serviços (YTD)", linestyle="--")
+axes[1,1].plot(ibcbr_norm, color="black", label="Índice IBC-BR", linestyle="-")
+axes[1,1].plot(industria_norm, color="darkblue", label="Indústria", linestyle="--")
+axes[1,1].plot(agropecuaria_norm, color="green", label="Agropecuária", linestyle="--")
+axes[1,1].plot(servicos_norm, color="purple", label="Serviços", linestyle="--")
 axes[1,1].annotate(f"{ibcbr_norm.iloc[-1,0]:.2f}%",
                    xy=(ibcbr_norm.index[-1], ibcbr_norm.iloc[-1,0] - 0.5),
                    ha="left", va="bottom", color="black", fontsize=5)
@@ -187,7 +193,7 @@ axes[1,1].annotate(f"{agropecuaria_norm.iloc[-1,0]:.2f}%",
                    ha="left", va="bottom", color="green", fontsize=5)
 axes[1,1].annotate(f"{servicos_norm.iloc[-1,0]:.2f}%",
                    xy=(servicos_norm.index[-1], servicos_norm.iloc[-1,0] + 0.05),
-                   ha="left", va="bottom", color="darkgray", fontsize=5)
+                   ha="left", va="bottom", color="purple", fontsize=5)
 axes[1,1].annotate(f"{ibcbr_var.iloc[-1,0]:.2f}%",
                    xy=(ibcbr_var.index[-1], ibcbr_var.iloc[-1,0] - 0.35),
                    ha="left", va="bottom", color=colors_bar, fontsize=5)
@@ -197,11 +203,9 @@ axes[1,1].set_title("IBC-BR e Setores", fontsize=8, loc="left")
 # Ajustes finais do gráfico
 plt.tight_layout(pad=2.0)
 fig.suptitle("Indicadores Econômicos - BR", fontsize=14)
-plt.annotate("Fonte: IBGE / Banco Central do Brasil (BCB)", xy=(0.06,0.02),
+plt.annotate("Fonte: IBGE / Banco Central do Brasil (BCB)", xy=(0.06,0.0),
              va="bottom", ha="left", xycoords="figure fraction",
-             color="black", fontsize=8)
-plt.annotate("Elaborado por: Fabricio Orlandin, CFP®", xy=(0.84,0.02),
+             color="black", fontsize=10)
+plt.annotate("Elaborado por: Fabricio Orlandin, CFP®", xy=(0.84,0.0),
              va="bottom", ha="right", xycoords="figure fraction",
-             color="black", fontsize=8)
-
-# %%
+             color="black", fontsize=10)
