@@ -4,8 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 # %% Lista de ativos
-start = "2024-12-30"
-end = "2025-12-30"
+start = "2025-12-30"
+end = "2026-01-03"
 ativos = ["^BVSP", "^GSPC", "BTC-USD", "GC=F", "BRL=X", "EURBRL=X"]
 data = yf.download(ativos, start, end)["Close"].dropna()
 data = data.rename(columns = {"BRL=X": "Dólar",
@@ -79,11 +79,11 @@ axes[1,2].annotate(f"Ouro: {data["Ouro"].iloc[-1]:.2f}",
                    va = "bottom", ha = "right", fontsize = 10, color = "blue",
                    bbox=dict(boxstyle="round,pad=0.25", fc="lightgray", ec="blue", lw=0.8, alpha=0.75))
 axes[1,2].legend()
-fig.suptitle("2025")
+fig.suptitle("2026", fontsize=30)
 plt.annotate("Fonte: Yahoo Finance", xy=(0.06,0.0),
              va="bottom", ha="left", xycoords="figure fraction",
-             color="black", fontsize=10)
+             color="black", fontsize=20)
 plt.annotate("Elaborado por: Fabricio Orlandin, CFP®", xy=(0.84,0.0),
              va="bottom", ha="right", xycoords="figure fraction",
-             color="black", fontsize=10)
+             color="black", fontsize=20)
 # %%
